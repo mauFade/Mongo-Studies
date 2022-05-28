@@ -1,9 +1,11 @@
-**Estudando Mongo DB**
+**Studying MongoDB**
 
-- Rode no terminal para inciar o mongodb
-  sudo service mongod start
+- Start Mongo in your local, otherwise the application will not start.
 
-- Depois, para inciar o servidor rode
+- Install the dependencies with
+  npm install
+
+- After that, run the following command on your terminal
   npm run dev
 
-- Assim, está tudp funcionando :)
+- Like that, everything will be running perfectly, use the routes and enjoy! :)
