@@ -106,7 +106,7 @@ class VacancyController {
 
       const targetVacancy = await Vacancy.findOne({ _id: id });
 
-      if (targetVacancy === null) {
+      if (targetVacancy === null || !targetVacancy) {
         return response.status(404).send(new CError("Error at method update.", "No post found."));
       }
 

@@ -14,16 +14,19 @@ class ProjectControler {
    */
   async create(request: Request, response: Response) {
     try {
-      const { id }: { id: any } = Object(request["query"]);
+      const { token }: { token: any } = Object(request["query"]);
 
       const { name, type, program }: { name: string; type: string; program: string } = Object(request["body"]);
+
+      // Desestrutura token
+      const userId = token["id"]["id"];
 
       if (!name || !type) {
         return response.status(403).send(new CError("Error at method create.", "Project name and type are required."));
       }
 
       const project = await Project.create({
-        user_id: id,
+        user_id: userId,
         name,
         type,
         program,
@@ -43,11 +46,14 @@ class ProjectControler {
    */
   async read(request: Request, response: Response) {
     try {
-      const { id }: { id: any } = Object(request["query"]);
-      const users = await User.find({}, "name email");
-      const projects = await Project.find({ user_id: id });
+      const { token }: { token: any } = Object(request["query"]);
 
-      return response.status(200).send(new CSuccess(true, { users, projects }));
+      // Desestrutura token
+      const userId = token["id"]["id"];
+
+      const projects = await Project.find({ user_id: userId });
+
+      return response.status(200).send(new CSuccess(true, projects));
       // Caso algo dê errado
     } catch (error) {
       // Retorna erro
@@ -62,7 +68,38 @@ class ProjectControler {
    */
   async update(request: Request, response: Response) {
     try {
-      return response.status(200).send("ok");
+      const {
+        newName,
+        newType,
+        newProgram,
+      }: {
+        newName: string;
+        newType: string;
+        newProgram: string;
+      } = Object(request["body"]);
+
+      // _id da vaga
+      const { id }: { id: string } = Object(request["query"]);
+
+      const targetProject = await Project.findOne({ _id: id });
+
+      if (targetProject === null || !targetProject) {
+        return response.status(404).send(new CError("Error at method update.", "No project found."));
+      }
+
+      const update = {
+        name: newName,
+        type: newType,
+        program: newProgram,
+      };
+
+      // Atualiza o projeto
+      const project = await Project.findOneAndUpdate({ _id: id }, update, {
+        new: true,
+      });
+
+      // Retorna sucesso
+      return response.status(200).send(new CSuccess(true, project));
       // Caso algo dê errado
     } catch (error) {
       // Retorna erro
@@ -77,7 +114,17 @@ class ProjectControler {
    */
   async delete(request: Request, response: Response) {
     try {
-      return response.status(200).send("ok");
+      // _id da vaga
+      const { id }: { id: string } = Object(request["query"]);
+
+      if (!id) {
+        return response.status(403).send(new CError("Error at method delete.", "An id must be sent."));
+      }
+
+      // Apaga a vaga do banco
+      await Project.findByIdAndDelete(id);
+
+      return response.status(200).send(new CSuccess(true, "Project deleted successfully"));
       // Caso algo dê errado
     } catch (error) {
       // Retorna erro
