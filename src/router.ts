@@ -19,6 +19,8 @@ router.get("/user", UserController.read);
 // Rotas de projetos
 router.post("/project", auth.verifyJWT, ProjectController.create);
 router.get("/project", auth.verifyJWT, ProjectController.read);
+router.put("/project", auth.verifyJWT, ProjectController.update);
+router.delete("/project", auth.verifyJWT, ProjectController.delete);
 
 // Rotas de vagas
 router.post("/vacancies", auth.verifyJWT, VacancyController.create);
