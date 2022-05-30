@@ -13,8 +13,10 @@ const router = Router();
 router.post("/login", AuthController.create);
 
 // Rotas de usuário
-router.post("/user", UserController.create);
-router.get("/user", UserController.read);
+router.post("/user", auth.verifyJWT, UserController.create);
+router.get("/user", auth.verifyJWT, UserController.read);
+router.put("/user", auth.verifyJWT, UserController.update);
+router.delete("/user", auth.verifyJWT, UserController.delete);
 
 // Rotas de projetos
 router.post("/project", auth.verifyJWT, ProjectController.create);

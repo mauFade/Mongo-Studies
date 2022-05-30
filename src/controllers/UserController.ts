@@ -65,6 +65,66 @@ class UserInstant {
       return response.status(500).send(new CError("Error at method read.", error));
     }
   }
+
+  /**
+   * Rota para update de dados de um usuário
+   * @params Dados para atualização
+   * @returns Updated user
+   */
+  async update(request: Request, response: Response) {
+    try {
+      const { newName, newEmail, newPassword }: { newName: string; newEmail: string; newPassword: string } = Object(
+        request["body"]
+      );
+
+      const { token } = Object(request["query"]);
+
+      // Id do usuário logado a fazer o update
+      const id = token["id"]["id"];
+
+      // Objeto de update
+      const update = {
+        name: newName,
+        email: newEmail,
+        password: newPassword,
+      };
+
+      // Atualiza o usuário
+      const user = await User.findOneAndUpdate({ _id: id }, update, {
+        new: true,
+      });
+
+      return response.status(200).send(new CSuccess(true, user));
+      // Caso algo dê errado
+    } catch (error) {
+      // Retorna erro
+      return response.status(500).send(new CError("Error at method update", error));
+    }
+  }
+
+  /**
+   * Rota para excluir um usuário
+   * @params Usuário a ser excluido
+   * @returns Deleted user
+   */
+  async delete(request: Request, response: Response) {
+    try {
+      const { token } = Object(request["query"]);
+
+      // Id do usuário logado a fazer o delete
+      const id = token["id"]["id"];
+
+      // Delete o usuário
+      await User.findByIdAndDelete(id);
+
+      return response.status(200).send(new CSuccess(true, "User deleted successfully."));
+
+      // Caso algo dê errado
+    } catch (error) {
+      // Retorna erro
+      return response.status(500).send(new CError("Error at method delete", error));
+    }
+  }
 }
 
 export default new UserInstant();
